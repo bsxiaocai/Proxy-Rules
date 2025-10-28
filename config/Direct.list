@@ -329,6 +329,17 @@ DOMAIN-SUFFIX,sandai.net
 DOMAIN-SUFFIX,thundercdn.com
 DOMAIN-SUFFIX,xunlei.com
 
+# 二游厂商（米哈游/鹰角/库洛/悠星）
+DOMAIN-SUFFIX,mihoyo.com
+DOMAIN-SUFFIX,miyoushe.com
+DOMAIN-SUFFIX,mihoyo.moe
+DOMAIN-SUFFIX,yuanshen.com
+DOMAIN-SUFFIX,hypergryph.com
+DOMAIN-SUFFIX,skland.com
+DOMAIN-SUFFIX,kurogames.com
+DOMAIN-SUFFIX,kurobbs.com
+DOMAIN-SUFFIX,yostar.cn
+DOMAIN-SUFFIX,bluearchive-cn.com
 
 # Public Direct CDN 公共直连
 #DOMAIN-SUFFIX,ajax.aspnetcdn.com

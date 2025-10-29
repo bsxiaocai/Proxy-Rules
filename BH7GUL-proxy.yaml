@@ -168,7 +168,7 @@ proxy-groups:
 # 此规则部分没有做防泄露处理，因为弊严重大于利！
 rules:
   # 额外规则代理
-  - DOMAIN-SUFFIX,bing.com,直连
+  - DOMAIN-SUFFIX,bing.com,直连  # 开代理后bing国内站会出现不能访问的情况，但是国内站不需要挂代理即可访问，所以在这里添加一条
   - DOMAIN-SUFFIX,mihoyo.com,直连
   # 规则集代理
   - DOMAIN-SUFFIX,fate-go.us,🚀 默认代理
@@ -177,7 +177,7 @@ rules:
   - RULE-SET,steamcn_domain,直连
   - RULE-SET,steam_domain,🕹️ Steam
   - RULE-SET,proxylite,🚀 默认代理
-  - RULE-SET,ai,🤖 AI
+  - RULE-SET,ai,🤖 AI  # 如果要用AI最好把这个放到比google等网站要前面的地方
   - RULE-SET,github_domain,👨🏿‍💻 GitHub
   - RULE-SET,youtube_domain,📹 YouTube
   - RULE-SET,google_domain,🍀 Google
@@ -197,6 +197,7 @@ rules:
 
 # 规则集
 ## type：可选http/file/inline  behavior：可选domain/ipcidr/classical format：可选yaml/text/mrs
+# 此处规则集的地址使用的是我自己的地址，您也可以使用原仓库的地址或者将原仓库fork下来进行使用
 
 rule-anchor:
   ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}

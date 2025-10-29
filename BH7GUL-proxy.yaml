@@ -211,7 +211,7 @@ rule-providers:
   private_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/private.mrs"}
   steam_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/steam.mrs"}
   steamcn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/steam@cn.mrs"}
-  proxylite: { <<: *class, url: "https://raw.githubusercontent.com/bsxiaocai/Proxy-Rules/refs/heads/main/proxy.list"}
+  proxylite: { <<: *class, url: "https://raw.githubusercontent.com/bsxiaocai/Proxy-Rules/refs/heads/main/config/proxy.list"}
   ai: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/category-ai-!cn.mrs" }
   youtube_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/youtube.mrs"}
   google_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/google.mrs"}

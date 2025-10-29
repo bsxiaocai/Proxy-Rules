@@ -1,0 +1,232 @@
+# 必读！！！
+# 注意规则在满足自己需求情况下，尽量做到精简，不要过度复杂，以免影响性能。
+# 跑裸核用户请自行去掉下方控制面板模块的注释。
+
+# 机场订阅（可以一直往下复制粘贴添加，注意格式对齐）
+proxy-providers:
+  Ariport-1:
+    url: "https://xxxxxxxxxx.xxxxxxxx"
+    type: http
+    interval: 86400 # 更新所用间隔的时间，以秒计算
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 300
+    proxy: 直连    # 机场订阅链接一般直连就可以连通，如果需要代理才能连接，则先开启代理，等此配置应用好、节点拉取好以后，再关闭代理即可。                     
+
+  Airport-2:
+    url: "https:xxxxxxxxxxxxx.xxxxxxx"
+    type: http
+    interval: 86400
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 300
+    proxy: 直连
+
+#  Airport2:
+#    url: "机场订阅填到这里，两端引号不要去掉，不要填写到下方链接里去！！"
+#    type: http
+#    interval: 86400
+#    health-check:
+#      enable: true
+#      url: https://www.gstatic.com/generate_204
+#      interval: 300
+#    proxy: 直连
+
+# 节点信息
+proxies:
+  - {name: 直连, type: direct}  # 此节点不可删去，代表着直连的节点，name后冒号可以更改名称，但是如果需要用到该节点必须名称一致
+
+# 全局配置 
+port: 7890
+socks-port: 7891
+redir-port: 7892
+mixed-port: 7893
+tproxy-port: 7894
+allow-lan: true
+bind-address: "*"
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+# interface-name: enp6s18
+log-level: warning
+find-process-mode: 'off'
+global-client-fingerprint: chrome
+keep-alive-idle: 600
+keep-alive-interval: 15
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+# 嗅探
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  force-domain:
+    - "+.v2ex.com"
+  skip-domain:
+    - "+.baidu.com"
+
+# 入站  
+tun:
+  enable: true
+  # system/gvisor/mixed
+  stack: mixed
+  dns-hijack: ["any:53", "tcp://any:53"]
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+
+# DNS模块
+dns:
+  enable: true
+  listen: 0.0.0.0:1053
+  ipv6: false
+  respect-rules: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 28.0.0.1/8
+  fake-ip-filter-mode: blacklist # 黑名单的意思是，该名单中的所有的网站都不会返回fake-ip
+  fake-ip-filter:
+    - "rule-set:private_domain,cn_domain"
+    - "+.msftconnecttest.com"
+    - "+.msftncsi.com"
+    - "time.*.com"
+    - "www.baidu.com"
+    - "www.mihoyo.com"
+    - "www.bilibili.com"  # 后三个网站因为本人需要用到校园网的认证检测，为检测脚本中的网站，需要返回真实ip
+  default-nameserver:
+    - 223.5.5.5
+  proxy-server-nameserver:
+    - https://223.5.5.5/dns-query
+  # namesever尽量用运营商提供的DNS（拨号的路由器概览一般能看得到运营商DNS），下面的nameserver参数记得修改
+  nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+ 
+# 出站策略，根据自己情况调整每个策略里分组排序，增删都可以，比如把美国自动放到第一个，比如删除香港故转，注意别漏掉表情逗号等。
+# 如果相应分组没有筛选到对应的国家，请根据自己节点名字调整筛选关键字。
+# 没有使用锚点，是考虑修改难度，这样修改某个分组可以上下对照。更容易些。
+
+# type的几种类型：
+# 1.url-test：代理组会定期测试其包含的所有代理服务器的连通性和延迟，并总是选择当前延迟最低（性能最好）的代理来使用。当选定的代理出现问题时，它也会自动切换到下一个可用且性能较好的代理。
+# 2.select：手动选择
+# 3.fallback：按顺序尝试直至成功，多用于故障转移
+# 4.load-balance：负载均衡
+# 5.ssid：根据WiFi SSID切换
+
+# include-all:true搭配filter规则使用，符合filter规则的节点会出现在这个代理组中
+
+#tolerance：容忍度，单位是毫秒，仅对url-test和fallback类型有效。例如：tolerance:20，如果最佳代理是100ms，那么120ms的代理也在可接受范围内，url-test可能不会立即切换，还保留在120ms的节点选择。
+
+#interval：测试间隔，单位是秒，仅对url-test和fallback类型有效。例如：interval:300，每隔300秒（即5分钟）检测一次所有代理延迟，并根据测试结果重新选择最佳代理。
+
+#filter：正则表达式。例如：filter: "(?=.*(美|US|(?i)States|America))^((?!(港|台|日|韩|新)).)*$"，意思是：【选取所有名称中包含“美”、“US”、“States”（不区分大小写）或“America”的节点，同时排除那些名称中也包含“港”、“台”、“日”、“韩”、“新”的节点】
+
+
+proxy-groups:
+  - {name: 🚀 默认代理, type: url-test,interval: 100, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动, 🌐 所有-自动]}
+  - {name: 🤖 AI, type: url-test,interval: 60, proxies: [♻️ 日本-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动]}
+  - {name: 🕹️ Steam, type: url-test ,interval: 60, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动, 🌐 所有-自动]}
+  - {name: 📹 YouTube, type: url-test,interval: 60, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 台湾-自动]}
+  - {name: 🍀 Google, type: url-test,interval: 60, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 东南亚-自动, 🌐 所有-自动]}
+  - {name: 👨🏿‍💻 GitHub, type: url-test,interval: 60, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, 🌐 所有-自动]}
+  - {name: 🐬 OneDrive, type: url-test,interval: 120, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动, 🌐 所有-自动]}
+  - {name: 🪟 Microsoft, type: url-test,interval: 120, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动, 🌐 所有-自动]}
+  - {name: 🎵 TikTok, type: url-test,interval: 120, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动, 🌐 所有-自动]}
+  - {name: 📲 Telegram, type: url-test,interval: 100, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动, 🌐 所有-自动]}
+  - {name: 🐟 漏网之鱼, type: url-test,interval: 180, proxies: [👆 手动选择, ♻️ 香港-自动, ♻️ 日本-自动, ♻️ 台湾-自动, ♻️ 新加坡-自动, ♻️ 韩国-自动, ♻️ 美国-自动, ♻️ 俄罗斯-自动, ♻️ 台日新韩澳-自动, ♻️ 港台日新韩澳-自动, ♻️ 东南亚-自动, ♻️ 澳洲-自动, ♻️ 欧洲-自动, ♻️ 中东-自动, ♻️ 拉丁美洲-自动, 🌐 所有-自动]}
+
+# 按如下配置，【👆 手动选择】代理组需要手动选择，其他都是自动选择。最好不要在某些需要科学上网的代理组中加入直连。
+# 请合理评估机场节点数量，以及interval的间隔。
+
+  - {name: 👆 手动选择, type: select, include-all: true}
+  - {name: ♻️ 香港-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(港|香港|(?i)HK|Hongkong)).*$"}
+  - {name: ♻️ 日本-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(日|(?i)JP|Japan)).*$"}
+  - {name: ♻️ 台湾-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(台|湾|灣|(?i)TW|Taiwan)).*$"}
+  - {name: ♻️ 新加坡-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(新加坡|坡|狮城|SG|Singapore)).*$"}
+  - {name: ♻️ 韩国-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(韩|韩国|韓國|首尔|汉城|(?i)KR|Korea)).*$"}
+  - {name: ♻️ 美国-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(美|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|硅谷|拉斯|洛杉|圣何塞|圣克拉|西雅|芝加|(?i)US|States|America)).*$"}
+  - {name: ♻️ 俄罗斯-自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^(?=.*(俄|俄罗斯|(?i)RU|Russia)).*$"}
+  - {name: ♻️ 台日新韩澳-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(澳门|韩|韩国|韓國|首尔|汉城|坡|狮城|日|台|湾|灣|(?i)KR|Korea|SG|Singapore|JP|Japan|TW|Taiwan|Macau)).*$"}
+  - {name: ♻️ 港台日新韩澳-自动, type: url-test, include-all: true, tolerance: 20, interval: 60, filter: "^(?=.*(澳门|韩|韩国|韓國|首尔|汉城|坡|狮城|日|台|湾|灣|港|香港|(?i)KR|Korea|SG|Singapore|JP|Japan|TW|Taiwan|HK|Hongkong|Macau)).*$"}
+  - {name: ♻️ 东南亚-自动, type: url-test, include-all: true, tolerance: 20, interval: 100, filter: "^(?=.*(越|越南|柬|柬埔寨|马来西亚|泰|泰国|印度尼西亚|印尼|老挝|菲|菲律宾|(?i)VN|Vietnam|KH|Cambodia|MY|Malaysia|TH|Thailand|Indonesia|Laos|Philippines)).*$"}
+  - {name: ♻️ 澳洲-自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^(?=.*(澳洲|澳大利亚|新西兰|悉尼|墨尔本|(?i)AU|Australia|NewZealand|Sydney|Melbourne)).*$"}
+  - {name: ♻️ 欧洲-自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^(?=.*(德国|英国|希腊|芬兰|意大利|比利时|法国|荷兰|冰岛|瑞士|瑞典|西班牙|爱尔兰|挪威|立陶宛|波兰|(?i)GR|UK|FR|Germany|Greece|Finland|Italy|Belgium|France|Netherlands|Iceland|Switzerland|Sweden|Spain|Ireland|Norway|Poland)).*$"}
+  - {name: ♻️ 中东-自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^(?=.*(阿拉伯|迪拜|沙特|利雅得|吉达|卡塔尔|以色列|土耳其|埃及|约旦|开罗|巴林|利比亚|也门|(?i)Arab|Dubai|Saudi|Arabia|Riyadh|Jeddah|Qatar|Israel|Turkey|Egypt|Jordan|Cairo|Bahrain|Libya|Yemen)).*$"}  
+  - {name: ♻️ 拉丁美洲-自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^(?=.*(巴西|阿根廷|墨西哥|秘鲁|玻利维亚|智利|哥伦比亚|厄瓜多尔|巴拉圭|乌拉圭|委内瑞拉|(?i)Brazil|Argentina|Mexico|Peru|Bolivia|Chile|Colombia|Ecuador|Paraguay|Venezuela|Uruguay)).*$"}
+  - {name: 🌐 所有-自动, type: url-test, include-all: true, tolerance: 20, interval: 300, filter: "^(?!.*(?i:DIRECT|REJECT|直连|拒绝)).*$"}
+
+# 规则匹配
+# 此规则部分没有做防泄露处理，因为弊严重大于利！
+rules:
+  # 额外规则代理
+  - DOMAIN-SUFFIX,bing.com,直连
+  - DOMAIN-SUFFIX,mihoyo.com,直连
+  # 规则集代理
+  - DOMAIN-SUFFIX,fate-go.us,🚀 默认代理
+  - RULE-SET,private_ip,直连
+  - RULE-SET,private_domain,直连
+  - RULE-SET,steamcn_domain,直连
+  - RULE-SET,steam_domain,🕹️ Steam
+  - RULE-SET,proxylite,🚀 默认代理
+  - RULE-SET,ai,🤖 AI
+  - RULE-SET,github_domain,👨🏿‍💻 GitHub
+  - RULE-SET,youtube_domain,📹 YouTube
+  - RULE-SET,google_domain,🍀 Google
+  - RULE-SET,onedrive_domain,🐬 OneDrive
+  - RULE-SET,microsoft_domain,🪟 Microsoft
+  - RULE-SET,apple_domain,直连
+  - RULE-SET,telegram_domain,📲 Telegram
+  - RULE-SET,apple_ip,直连,no-resolve
+  - RULE-SET,google_ip,🍀 Google,no-resolve
+  - RULE-SET,telegram_ip,📲 Telegram,no-resolve
+  - RULE-SET,geolocation-!cn,🚀 默认代理
+  - RULE-SET,cn_domain,直连
+  - RULE-SET,cn_ip,直连
+  - MATCH,🐟 漏网之鱼
+
+
+
+# 规则集
+## type：可选http/file/inline  behavior：可选domain/ipcidr/classical format：可选yaml/text/mrs
+
+rule-anchor:
+  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
+  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
+  class: &class {type: http, interval: 86400, behavior: classical, format: text}
+
+rule-providers: 
+
+# domain部分：
+
+  private_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/private.mrs"}
+  steam_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/steam.mrs"}
+  steamcn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/steam@cn.mrs"}
+  proxylite: { <<: *class, url: "https://raw.githubusercontent.com/bsxiaocai/Proxy-Rules/refs/heads/main/proxy.list"}
+  ai: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/category-ai-!cn.mrs" }
+  youtube_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/youtube.mrs"}
+  google_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/google.mrs"}
+  github_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/github.mrs"}
+  telegram_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/telegram.mrs"}
+  onedrive_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/onedrive.mrs"}
+  microsoft_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/microsoft.mrs"}
+  apple_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/apple-cn.mrs"}
+  speedtest_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/ookla-speedtest.mrs"}
+  geolocation-!cn: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/geolocation-!cn.mrs"}
+  cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geosite/cn.mrs"}
+  
+#ip部分：
+
+  private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geoip/private.mrs"}
+  cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geoip/cn.mrs"}
+  google_ip: { <<: *ip, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geoip/google.mrs"}
+  telegram_ip: { <<: *ip, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo/geoip/telegram.mrs"}
+  apple_ip: {<<: *ip, url: "https://raw.githubusercontent.com/bsxiaocai/meta-rules-dat/refs/heads/meta/geo-lite/geoip/apple.mrs"}

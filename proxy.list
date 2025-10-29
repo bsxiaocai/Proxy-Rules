@@ -1,10 +1,12 @@
-# 代理补充列表
+# 基于原作者qichiyu更改而来
+# 链接：https://github.com/qichiyuhub/rule/blob/main/proxy.list
+# 代理补充列表，请根据自己的需要进行修改
 
 # 域名后缀匹配
-DOMAIN-SUFFIX,qichiyu.com
+DOMAIN-SUFFIX,fate-go.us
 
 # 域名关键字匹配
-DOMAIN-KEYWORD,1e100
+DOMAIN-KEYWORD,hoyoverse
 
 # 国外DNS
 DOMAIN-SUFFIX,dns.google
